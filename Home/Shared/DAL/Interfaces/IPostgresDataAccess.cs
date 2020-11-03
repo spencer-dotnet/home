@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Home.Shared.DAL
+namespace Home.Shared.DAL.Interfaces
 {
     public interface IPostgresDataAccess
     {
