@@ -4,4 +4,11 @@
 
 Welcome to your new app.
 
+<MyFirstComponent />
+<MySecondComponent CurrentCountValue=@currentCount />
+
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+    private int currentCount = 100;
+}

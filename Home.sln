@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Home.Server", "Home\Server\Home.Server.csproj", "{99A85AB0-34C5-42FB-8E0A-F5FBA7D5A1F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Home.Server", "Home\Server\Home.Server.csproj", "{99A85AB0-34C5-42FB-8E0A-F5FBA7D5A1F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Home.Client", "Home\Client\Home.Client.csproj", "{F49C75D8-C408-4272-AB03-961A1C5B6565}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Home.Client", "Home\Client\Home.Client.csproj", "{F49C75D8-C408-4272-AB03-961A1C5B6565}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Home.Shared", "Home\Shared\Home.Shared.csproj", "{16A32E33-10A4-45D5-87BA-F92CE85F4888}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Home.Shared", "Home\Shared\Home.Shared.csproj", "{16A32E33-10A4-45D5-87BA-F92CE85F4888}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

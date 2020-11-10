@@ -1,0 +1,82 @@
+﻿@inject HttpClient _httpClient
+
+
+<div>
+    <button class="btn btn-primary" @onclick="AddExpense">Add Expense</button>
+
+    @if (expenses == null)
+    {
+        <p> expeses go here</p>
+        <button class="btn btn-primary" @onclick="GetExpenses">Get Expenses</button>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Date</td>
+                    <td>Amount</td>
+                    <td>Category</td>
+                    <td><!--Blank--></td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in expenses)
+                {
+                    <tr>
+                        <td>@e.Date.ToShortDateString()</td>
+                        <td>@e.Amount</td>
+                        <td>@e.Category</td>
+                        <td><button class="btn btn-danger" @onclick="(ev => DeleteExpense(e.Id))">Delete</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+
+@code {
+    private List<Expense> expenses;
+
+    private async void GetExpenses()
+    {
+        var response = await _httpClient.GetAsync("api/expense");
+
+        expenses = await response.Content.ReadFromJsonAsync<List<Expense>>();
+
+        StateHasChanged();
+    }
+
+    private async void AddExpense()
+    {
+        Expense newExpense = new Expense()
+        {
+            Date = DateTime.Now,
+            Category = ExpenseCategory.Other,
+            PaymentMode = "Credit Card",
+            Type = ExpenseType.Expense,
+            Description = "Test",
+            Amount = 1337.42M
+
+        };
+
+        var response = await _httpClient.PostAsJsonAsync<Expense>("api/expense", newExpense);
+
+        Console.WriteLine(response.Headers.Location.ToString());
+
+        expenses.Add(await response.Content.ReadFromJsonAsync<Expense>());
+
+        StateHasChanged();
+    }
+
+    private async void DeleteExpense(string id)
+    {
+        await _httpClient.DeleteAsync($"api/expense/{id}");
+
+        expenses.RemoveAll(exp => exp.Id == id);
+
+        StateHasChanged();
+    }
+
+}

@@ -1,0 +1,125 @@
+﻿
+<EditForm Model="newExpense" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="date">Date</label>
+        <input type="date" class="form-control" id="date" @bind="newExpense.Date" />
+    </div>
+
+    @foreach (var choice in new[] { ExpenseType.Expense, ExpenseType.Income})
+    {
+        <label>
+            <input name="expenseType" type="radio"
+                   value="@choice"
+                   checked="@(currentExpenseType == choice)"
+                   @onchange="@((e) => { currentExpenseType = choice; SetCategories(e); })" />
+            @choice
+        </label>
+    }
+
+    <div class="form-group">
+        <label for="amount">Amount</label>
+        <input type="number" class="form-control" id="amount" step="any" @bind="newExpense.Amount" />
+    </div>
+
+    @if (currentExpenseType == ExpenseType.Expense)
+    {
+        <div class="form-group">
+            <label for="paymentmode">Payment Method</label>
+            <select class="form-control" id="paymentMode" @bind="newExpense.PaymentMode">
+                <option selected>Debit Card</option>
+                <option>Credit Card</option>
+                <option>Cash</option>
+                <option>Venmo</option>
+                <option>Other</option>
+            </select>
+        </div>
+    }
+
+    <div class="form-group">
+        <label for="category">Category</label>
+        <select class="form-control" id="category" @bind="newExpense.Category">
+            @foreach (string cat in selectableCategories)
+            {
+                <option>@cat</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description</label>
+        <input type="text" class="form-control" id="description" @bind-value="newExpense.Description" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
+@code {
+    Expense newExpense = new Expense() { Date = DateTime.Now };
+
+    string[] expenseCategories = Enum.GetNames(typeof(ExpenseCategory));
+    string[] selectableCategories;
+    ExpenseType currentExpenseType = ExpenseType.Expense;
+
+    private void SetCategories(ChangeEventArgs e)
+    {
+        var selectedString = e.Value.ToString();
+        ExpenseType type;
+
+        Enum.TryParse<ExpenseType>(selectedString, out type);
+
+        newExpense.Type = type;
+
+        if (selectedString == "Expense")
+        {
+            selectableCategories = expenseCategories.Take(expenseCategories.Length - 4).ToArray();
+        }
+        else
+        {
+            selectableCategories = expenseCategories.Skip(expenseCategories.Length - 4).Take(4).ToArray();
+            newExpense.PaymentMode = null;
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+        Expense submittedExpense = new Expense()
+        {
+            Date = newExpense.Date,
+            Category = newExpense.Category,
+            PaymentMode = newExpense.PaymentMode,
+            Type = newExpense.Type,
+            Amount = newExpense.Amount,
+            Description = newExpense.Description
+        };
+
+        //System.Reflection.PropertyInfo[] properties = typeof(Expense).GetProperties();
+        //foreach(var property in properties)
+        //{
+        //    Console.WriteLine(property.GetValue(submittedExpense).ToString());
+        //}
+
+        Console.WriteLine(newExpense.ToString());
+
+        //clear form
+        newExpense = new Expense() { Date = DateTime.Now };
+    }
+
+    protected override void OnInitialized()
+    {
+        selectableCategories = expenseCategories.Skip(expenseCategories.Length - 4).Take(4).ToArray();
+    }
+
+}
+
+@*
+    public DateTime Date { get; set; }
+    public ExpenseCategory Category { get; set; }
+    public string PaymentMode { get; set; }
+    public ExpenseType Type { get; set; }
+    public string Description { get; set; }
+    public decimal Amount { get; set; }
+*@
