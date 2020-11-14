@@ -7,13 +7,13 @@ using System.Text;
 
 namespace Home.Shared.Services
 {
-    public class ExpenseService
+    public class UserService
     {
-        private readonly IMongoCollection<Expense> _expenses;
+        private readonly IMongoCollection<User> _users;
 
         private readonly IConfiguration _config;
 
-        public ExpenseService(IConfiguration config)
+        public UserService(IConfiguration config)
         {
             _config = config;
 
@@ -33,28 +33,28 @@ namespace Home.Shared.Services
             var client = new MongoClient(connectionString);
             var database = client.GetDatabase("family");
 
-            _expenses = database.GetCollection<Expense>("expense");
+            _users = database.GetCollection<User>("users");
         }
 
-        public List<Expense> Get() =>
-            _expenses.Find(expense => true).ToList();
+        public List<User> Get() =>
+            _users.Find(user => true).ToList();
 
-        public Expense Get(string id) =>
-            _expenses.Find<Expense>(expense => expense.Id == id).FirstOrDefault();
+        public User Get(string email) =>
+            _users.Find<User>(user => user.EmailAddress == email).FirstOrDefault();
 
-        public Expense Create(Expense expense)
+        public User Create(User user)
         {
-            _expenses.InsertOne(expense);
-            return expense;
+            _users.InsertOne(user);
+            return user;
         }
 
-        public void Update(string id, Expense expenseIn) =>
-            _expenses.ReplaceOne(expense => expense.Id == id, expenseIn);
+        public void Update(string id, User userIn) =>
+            _users.ReplaceOne(user => user.Id == id, userIn);
 
-        public void Remove(Expense expenseIn) =>
-            _expenses.DeleteOne(e => e.Id == expenseIn.Id);
+        public void Remove(User userIn) =>
+            _users.DeleteOne(e => e.Id == userIn.Id);
 
         public void Remove(string id) =>
-            _expenses.DeleteOne(e => e.Id == id);
+            _users.DeleteOne(e => e.Id == id);
     }
 }

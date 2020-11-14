@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Home.Shared.DAL.Models;
 using Home.Shared.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson.IO;
 
 namespace Home.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ExpenseController : ControllerBase

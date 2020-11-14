@@ -1,11 +1,12 @@
 ﻿@inject HttpClient _httpClient
-@inject ExpenseStateContainer ExpenseState
-
 
 <div>
-    @if (ExpenseState.Expenses == null)
+    @if (AppState.Expenses == null || AppState.Expenses.Count == 0)
     {
         <p>Loading...</p>
+        <div class="alert-danger">
+            @ErrorMessage
+        </div>
     }
     else
     {
@@ -19,11 +20,11 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var e in ExpenseState.Expenses)
+                @foreach (var e in AppState.Expenses)
                 {
                     <tr>
                         <td>@e.Date.ToShortDateString()</td>
-                        <td>@e.Amount</td> 
+                        <td>@e.Amount</td>
                         <td>@e.Category</td>
                         <td><button class="btn btn-danger" @onclick="(ev => DeleteExpense(e.Id))">Delete</button></td>
                     </tr>
@@ -35,34 +36,35 @@
 
 
 @code {
+    [CascadingParameter] public CascadingAppState AppState { get; set; }
+
+    public string ErrorMessage { get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
-        ExpenseState.OnChange += StateHasChanged;
-
-        if(ExpenseState.Expenses == null)
+        if(AppState.Expenses.Count == 0)
         {
-            await GetExpenses();
+            var response = await _httpClient.GetAsync("api/expense");
+
+            if (response.IsSuccessStatusCode)
+            {
+                AppState.Expenses = await response.Content.ReadFromJsonAsync<List<Expense>>();
+            }
+            else
+            {
+                ErrorMessage = $"Failed to Fetch Data {response.StatusCode}";
+            }
+
         }
-    }
-
-    private async Task<List<Expense>> GetExpenses()
-    {
-        var response = await _httpClient.GetAsync("api/expense");
-
-        return await response.Content.ReadFromJsonAsync<List<Expense>>();
     }
 
     private async void DeleteExpense(string id)
     {
-        await _httpClient.DeleteAsync($"api/expense/{id}");
+        var response = await _httpClient.DeleteAsync($"api/expense/{id}");
 
-        ExpenseState.Expenses.RemoveAll(exp => exp.Id == id);
-
-        StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        ExpenseState.OnChange -= StateHasChanged;
+        if(response.IsSuccessStatusCode)
+        {
+            AppState.RemoveExpenseById(id);
+        }
     }
 }

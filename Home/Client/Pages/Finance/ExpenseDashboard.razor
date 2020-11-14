@@ -1,16 +1,29 @@
 ﻿@page "/expenses"
+@attribute [Authorize]
 
-<h3>ExpenseDashboard</h3>
+<h3>ExpenseDashboard </h3>
+
+<SN_Model @ref="modal">
+    <Title>Add Expense</Title>
+    <Body>
+        <AddExpenseForm />
+    </Body>
+    <Footer>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => modal.Close()">Close</button>
+    </Footer>
+</SN_Model>
 
 <ExpenseTable />
 
-<div class="card">
-    <div class="card-body">
-        <AddExpenseForm />
+    <div class="card">
+        <div class="card-body">
+            <AddExpenseForm />
+        </div>
     </div>
-</div>
 
 
 @code {
+
+    private SN_Model modal { get; set; }
 
 }

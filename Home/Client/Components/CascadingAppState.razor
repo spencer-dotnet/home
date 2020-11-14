@@ -1,0 +1,46 @@
+﻿<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+        }
+
+        #region Expenses
+        private List<Expense> expenses = new List<Expense>();
+
+    public List<Expense> Expenses
+    {
+        get
+        {
+            return expenses;
+        }
+        set
+        {
+            expenses = value;
+            StateHasChanged();
+        }
+    }
+
+    public void AddExpense(Expense newExpense)
+    {
+        expenses.Add(newExpense);
+        StateHasChanged();
+    }
+
+    public void RemoveExpenseById(string id)
+    {
+        expenses.RemoveAll(exp => exp.Id == id);
+        StateHasChanged();
+    }
+    #endregion
+
+
+
+}

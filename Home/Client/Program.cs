@@ -19,7 +19,6 @@ namespace Home.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
-            builder.Services.AddSingleton<ExpenseStateContainer>();
             builder.Services.AddScoped<AppState>();
 
             builder.Services

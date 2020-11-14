@@ -1,5 +1,4 @@
-﻿@inject ExpenseStateContainer ExpenseState
-@inject HttpClient HttpClient
+﻿@inject HttpClient HttpClient
 
 <EditForm Model="newExpense" OnValidSubmit="@HandleValidSubmit">
     <DataAnnotationsValidator />
@@ -60,6 +59,9 @@
 </EditForm>
 
 @code {
+    [CascadingParameter]
+    CascadingAppState AppState { get; set; }
+
     Expense newExpense = new Expense() { Date = DateTime.Now };
 
     string[] expenseCategories = Enum.GetNames(typeof(ExpenseCategory));
@@ -104,7 +106,9 @@
         {
             System.Diagnostics.Debug.WriteLine("POST SUCCESS");
 
-            ExpenseState.Expenses.Add(submittedExpense);
+            var newExpense = await response.Content.ReadFromJsonAsync<Expense>();
+
+            AppState.AddExpense(newExpense);
         }
 
 
@@ -115,8 +119,6 @@
     protected override void OnInitialized()
     {
         selectableCategories = expenseCategories.Skip(expenseCategories.Length - 4).Take(4).ToArray();
-
-        ExpenseState.OnChange += StateHasChanged;
     }
 
 }
