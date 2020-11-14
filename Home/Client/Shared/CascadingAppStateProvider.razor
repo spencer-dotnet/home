@@ -1,0 +1,28 @@
+﻿@*@inject ILocalStorageService LocalStorageService
+
+@if (hasLoaded)
+{
+    <CascadingValue Value="@this">
+        @ChildContent
+    </CascadingValue>
+}
+
+@code
+{
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    public AppState AppState { get; set; }
+
+    bool hasLoaded;
+
+    protected override Task OnParametersSetAsync()
+    {
+        var json = await LocalStorageService.GetItem("AppStateJson");
+
+        if (json != null && json != "")
+        {
+            var Data = js
+        }
+    }
+}*@

@@ -1,4 +1,6 @@
-﻿
+﻿@inject ExpenseStateContainer ExpenseState
+@inject HttpClient HttpClient
+
 <EditForm Model="newExpense" OnValidSubmit="@HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -84,7 +86,7 @@
         }
     }
 
-    private void HandleValidSubmit()
+    private async void HandleValidSubmit()
     {
         Expense submittedExpense = new Expense()
         {
@@ -96,13 +98,15 @@
             Description = newExpense.Description
         };
 
-        //System.Reflection.PropertyInfo[] properties = typeof(Expense).GetProperties();
-        //foreach(var property in properties)
-        //{
-        //    Console.WriteLine(property.GetValue(submittedExpense).ToString());
-        //}
+        var response = await HttpClient.PostAsJsonAsync<Expense>("api/expense", submittedExpense);
 
-        Console.WriteLine(newExpense.ToString());
+        if(response.IsSuccessStatusCode)
+        {
+            System.Diagnostics.Debug.WriteLine("POST SUCCESS");
+
+            ExpenseState.Expenses.Add(submittedExpense);
+        }
+
 
         //clear form
         newExpense = new Expense() { Date = DateTime.Now };
@@ -111,6 +115,8 @@
     protected override void OnInitialized()
     {
         selectableCategories = expenseCategories.Skip(expenseCategories.Length - 4).Take(4).ToArray();
+
+        ExpenseState.OnChange += StateHasChanged;
     }
 
 }

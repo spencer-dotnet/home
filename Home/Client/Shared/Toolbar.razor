@@ -1,0 +1,44 @@
+﻿@inject AppState AppState
+@implements IDisposable
+
+<div style="height:42px;">
+    <span style="font-size:x-large">@AppState.Message&nbsp;</span>
+    @if (AppState.Enabled)
+    {
+        <button class="btn btn-success">Enabled</button>
+    }
+    else
+    {
+        <button class="btn btn-danger">Disabled</button>
+    }
+    &nbsp;
+    <button class="btn btn-primary" @onclick="UpdateMessageButtonClicked">Update Message</button>
+</div>
+
+@code{
+
+    void UpdateMessageButtonClicked()
+    {
+        string msg = "Message Updated At " + DateTime.Now.ToLongTimeString();
+        AppState.UpdateMessage(this, msg);
+    }
+
+    private async Task AppState_StateChanged(ComponentBase Source, string Property)
+    {
+        if (Source != this)
+        {
+            // Inspect Property to determine if action needs to be taken
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        AppState.StateChanged += async (Source, Property) => await AppState_StateChanged(Source, Property);
+    }
+
+    void IDisposable.Dispose()
+    {
+        AppState.StateChanged -= async (Source, Property) => await AppState_StateChanged(Source, Property);
+    }
+}

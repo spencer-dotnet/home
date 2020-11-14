@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Home.Client.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Home.Client
 {
@@ -16,6 +18,18 @@ namespace Home.Client
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
+
+            builder.Services.AddSingleton<ExpenseStateContainer>();
+            builder.Services.AddScoped<AppState>();
+
+            builder.Services
+                .AddScoped<IAuthService, AuthService>()
+                .AddScoped<IUserService, UserService>()
+                .AddScoped<IHttpService, HttpService>()
+                .AddScoped<ILocalStorageService, LocalStorageService>()
+                .AddAuthorizationCore()
+                .AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
+
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

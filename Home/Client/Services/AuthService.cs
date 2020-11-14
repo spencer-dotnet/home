@@ -12,7 +12,14 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Home.Client.Services
 {
-    public class AuthService
+    public interface IAuthService
+    {
+        Task<LoginResult> Login(LoginModel loginModel);
+        Task Logout();
+        Task<RegisterResult> Register(RegisterModel registerModel);
+    }
+
+    public class AuthService : IAuthService
     {
         private readonly HttpClient _httpClient;
         private readonly AuthenticationStateProvider _authenticationStateProvider;

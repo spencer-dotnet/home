@@ -1,13 +1,11 @@
 ﻿@inject HttpClient _httpClient
+@inject ExpenseStateContainer ExpenseState
 
 
 <div>
-    <button class="btn btn-primary" @onclick="AddExpense">Add Expense</button>
-
-    @if (expenses == null)
+    @if (ExpenseState.Expenses == null)
     {
-        <p> expeses go here</p>
-        <button class="btn btn-primary" @onclick="GetExpenses">Get Expenses</button>
+        <p>Loading...</p>
     }
     else
     {
@@ -21,11 +19,11 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var e in expenses)
+                @foreach (var e in ExpenseState.Expenses)
                 {
                     <tr>
                         <td>@e.Date.ToShortDateString()</td>
-                        <td>@e.Amount</td>
+                        <td>@e.Amount</td> 
                         <td>@e.Category</td>
                         <td><button class="btn btn-danger" @onclick="(ev => DeleteExpense(e.Id))">Delete</button></td>
                     </tr>
@@ -37,46 +35,34 @@
 
 
 @code {
-    private List<Expense> expenses;
+    protected override async Task OnInitializedAsync()
+    {
+        ExpenseState.OnChange += StateHasChanged;
 
-    private async void GetExpenses()
+        if(ExpenseState.Expenses == null)
+        {
+            await GetExpenses();
+        }
+    }
+
+    private async Task<List<Expense>> GetExpenses()
     {
         var response = await _httpClient.GetAsync("api/expense");
 
-        expenses = await response.Content.ReadFromJsonAsync<List<Expense>>();
-
-        StateHasChanged();
-    }
-
-    private async void AddExpense()
-    {
-        Expense newExpense = new Expense()
-        {
-            Date = DateTime.Now,
-            Category = ExpenseCategory.Other,
-            PaymentMode = "Credit Card",
-            Type = ExpenseType.Expense,
-            Description = "Test",
-            Amount = 1337.42M
-
-        };
-
-        var response = await _httpClient.PostAsJsonAsync<Expense>("api/expense", newExpense);
-
-        Console.WriteLine(response.Headers.Location.ToString());
-
-        expenses.Add(await response.Content.ReadFromJsonAsync<Expense>());
-
-        StateHasChanged();
+        return await response.Content.ReadFromJsonAsync<List<Expense>>();
     }
 
     private async void DeleteExpense(string id)
     {
         await _httpClient.DeleteAsync($"api/expense/{id}");
 
-        expenses.RemoveAll(exp => exp.Id == id);
+        ExpenseState.Expenses.RemoveAll(exp => exp.Id == id);
 
         StateHasChanged();
     }
 
+    public void Dispose()
+    {
+        ExpenseState.OnChange -= StateHasChanged;
+    }
 }
