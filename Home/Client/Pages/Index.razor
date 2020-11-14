@@ -1,8 +1,22 @@
 ﻿@page "/"
+@using Home.Shared
+@using System.Text
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<button class="btn btn-primary" @onclick="HashTest">get hash</button>
+<button class="btn btn-primary" @onclick="Test">Password</button>
+
+<p>
+    @Hash
+</p>
+
+@if(isPass)
+{
+    <p>IS PASS!</p>
+}
 
 <MyFirstComponent />
 <MySecondComponent CurrentCountValue=@currentCount />
@@ -11,4 +25,26 @@ Welcome to your new app.
 
 @code {
     private int currentCount = 100;
+
+    private string Hash { get; set; } = "hash";
+
+    private bool isPass { get; set; } = false;
+
+    private void HashTest()
+    {
+        using(var sha256 = SHA256.Create())
+        {
+            var hasedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes("Hello World"));
+
+            var hash = BitConverter.ToString(hasedBytes).Replace("-", "").ToLower();
+
+            Hash = hash;
+        }
+    }
+
+    private void Test()
+    {
+        isPass = PasswordHash.VerifyPassword("Hello World", Hash);
+    }
+
 }

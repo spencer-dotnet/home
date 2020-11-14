@@ -1,4 +1,6 @@
-﻿using Home.Shared.DAL.Models;
+﻿using Home.Shared;
+using Home.Shared.DAL.Models;
+using Home.Shared.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -18,24 +20,34 @@ namespace Home.Server.Controllers
     {
         private readonly IConfiguration _configuration;
         //private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserService _userService;
 
-        public LoginController(IConfiguration configuration)
+        public LoginController(IConfiguration configuration, UserService userService)
         {
             _configuration = configuration;
+            _userService = userService;
         }
 
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginModel login)
         {
-            // check if user exists
 
-            // if not then send back bad request
+            var user = _userService.Get(login.Email);
+
+            // check if user exists
+            if (user == null)
+            {
+                return Ok(new LoginResult { Successful = false, Error = "Email/Password is not correct" });
+            }
+
+            if (!PasswordHash.VerifyPassword(login.Password, user.Password))
+            {
+                return Ok(new LoginResult { Successful = false, Error = "Email/Password is not correct" });
+            }
 
             //var result = await _signInManager.PasswordSignInAsync(login.Email, login.Password, false, false);
 
             //if (!result.Succeeded) return BadRequest(new LoginResult { Successful = false, Error = "Username and password are invalid." });
-
-            //for testing just sent the request through as valid
 
 
             var claims = new[]

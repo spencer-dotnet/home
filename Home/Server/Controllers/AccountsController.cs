@@ -1,5 +1,7 @@
-﻿using Home.Shared.DAL.Models;
+﻿using Home.Shared;
+using Home.Shared.DAL.Models;
 using Home.Shared.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Home.Server.Controllers
 {
-
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountsController : ControllerBase
@@ -47,8 +49,8 @@ namespace Home.Server.Controllers
                 User newUser = new User
                 { 
                     UserName = model.Email,
-                    EmailAddress = model.Email,
-                    Password = model.Password,
+                    EmailAddress =  model.Email,
+                    Password = PasswordHash.GetHash(model.Password),
                 };
 
                 _userSerivce.Create(newUser);
