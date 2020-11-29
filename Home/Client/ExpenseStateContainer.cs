@@ -8,13 +8,21 @@ namespace Home.Client
 {
     public class ExpenseStateContainer
     {
-        public List<Expense> Expenses { get; set; }
+        public List<Expense> Expenses { get; private set; }
+
+        public Expense ExpenseToEdit { get; private set; }
 
         public event Action OnChange;
 
         public void SetExpenses(List<Expense> value)
         {
             Expenses = value;
+            NotifyStateChanged();
+        }
+
+        public void SetExpenseToEdit(Expense value)
+        {
+            ExpenseToEdit = value;
             NotifyStateChanged();
         }
 

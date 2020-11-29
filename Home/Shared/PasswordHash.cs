@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace Home.Shared
 {
@@ -42,6 +43,32 @@ namespace Home.Shared
 
                 return false;
             }
+        }
+
+        public static bool JwtIsExpired(string jwt)
+        {
+            var payload = jwt.Split('.')[1];
+            var jsonBytes = ParseBase64WithoutPadding(payload);
+            var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
+
+            keyValuePairs.TryGetValue("exp", out object expires);
+
+            if (expires != null)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static byte[] ParseBase64WithoutPadding(string base64)
+        {
+            switch (base64.Length % 4)
+            {
+                case 2: base64 += "=="; break;
+                case 3: base64 += "="; break;
+            }
+            return Convert.FromBase64String(base64);
         }
     }
 }

@@ -7,13 +7,17 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-        }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
 
-        #region Expenses
-        private List<Expense> expenses = new List<Expense>();
+    #region Expenses
+    private List<Expense> expenses = new List<Expense>();
+
+    private List<Expense> DO_NOT_EDIT_EXPENSES = new List<Expense>();
+
+    private Expense expenseToEdit = new Expense();
 
     public List<Expense> Expenses
     {
@@ -28,9 +32,42 @@
         }
     }
 
+    public Expense ExpenseToEdit
+    {
+        get
+        {
+            return expenseToEdit;
+        }
+        set
+        {
+            expenseToEdit = value;
+            StateHasChanged();
+        }
+    }
+
+    public List<Expense> DoNotEditListExpenses
+    {
+        get
+        {
+            return DO_NOT_EDIT_EXPENSES;
+        }
+        set
+        {
+            DO_NOT_EDIT_EXPENSES = value;
+            StateHasChanged();
+        }
+
+    }
+
     public void AddExpense(Expense newExpense)
     {
         expenses.Add(newExpense);
+        StateHasChanged();
+    }
+
+    public void EditExpense(Expense expense)
+    {
+        expenses[expenses.FindIndex(e => e.Id.Equals(expense.Id))] = expense;
         StateHasChanged();
     }
 

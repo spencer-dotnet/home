@@ -1,0 +1,18 @@
+﻿* {
+    background-color: rgba(0, 0, 0, 0.00);
+}
+
+.NavGroupClass {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+.oi-custom {
+    margin-right: 10px;
+}

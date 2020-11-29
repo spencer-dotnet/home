@@ -65,7 +65,7 @@ namespace Home.Client.Services
         {
             await _localStorage.RemoveItem("authToken");
             ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
-            _httpClient.DefaultRequestHeaders.Authorization = null;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", "");
         }
     }
 }

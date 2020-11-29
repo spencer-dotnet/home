@@ -1,0 +1,127 @@
+﻿@page "/edit"
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<EditForm Model="EditExpense" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="date">Date</label>
+        <input type="date" class="form-control" id="date" @bind="EditExpense.Date" />
+    </div>
+
+    @foreach (var choice in new[] { ExpenseType.Expense, ExpenseType.Income })
+    {
+        <label>
+            <input name="expenseType" type="radio"
+                   value="@choice"
+                   checked="@(currentExpenseType == choice)"
+                   @onchange="@((e) => { currentExpenseType = choice; SetCategories(e.Value); })" />
+            @choice
+        </label>
+    }
+
+    <div class="form-group">
+        <label for="amount">Amount</label>
+        <input type="number" class="form-control" id="amount" step="any" @bind="EditExpense.Amount" />
+    </div>
+
+    @if (currentExpenseType == ExpenseType.Expense)
+    {
+        <div class="form-group">
+            <label for="paymentmode">Payment Method</label>
+            <select class="form-control" id="paymentMode" @bind="EditExpense.PaymentMode">
+                <option selected>Debit Card</option>
+                <option>Credit Card</option>
+                <option>Cash</option>
+                <option>Venmo</option>
+                <option>Other</option>
+            </select>
+        </div>
+    }
+
+    <div class="form-group">
+        <label for="category">Category</label>
+        <select class="form-control" id="category" @bind="EditExpense.Category">
+            @foreach (string cat in selectableCategories)
+            {
+                <option>@cat</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description</label>
+        <input type="text" class="form-control" id="description" @bind-value="EditExpense.Description" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
+@code {
+    [CascadingParameter]
+    CascadingAppState AppState { get; set; }
+
+    public Expense EditExpense = new Expense();
+
+    string[] expenseCategories = Enum.GetNames(typeof(ExpenseCategory));
+    string[] selectableCategories;
+    ExpenseType currentExpenseType = ExpenseType.Expense;
+
+    private void SetCategories(object e)
+    {
+        var selectedString = e.ToString();
+        ExpenseType type;
+
+        Enum.TryParse<ExpenseType>(selectedString, out type);
+
+        EditExpense.Type = type;
+
+        if (selectedString == "Expense")
+        {
+            selectableCategories = expenseCategories.Take(expenseCategories.Length - 4).ToArray();
+        }
+        else
+        {
+            selectableCategories = expenseCategories.Skip(expenseCategories.Length - 4).Take(4).ToArray();
+            EditExpense.PaymentMode = null;
+        }
+
+        StateHasChanged();
+    }
+
+    private async void HandleValidSubmit()
+    {
+        System.Diagnostics.Debug.WriteLine("Successful Submit");
+
+        var response = await HttpClient.PutAsJsonAsync<Expense>($"api/expense/{EditExpense.Id}", EditExpense);
+
+
+        if (response.IsSuccessStatusCode)
+        {
+            System.Diagnostics.Debug.WriteLine("PUT SUCCESS");
+
+            AppState.EditExpense(EditExpense);
+
+            NavigationManager.NavigateTo("/expenses");
+        }
+    }
+
+    private void PaymentModeChanged(EventArgs e)
+    {
+
+    }
+
+    protected override void OnInitialized()
+    {
+        EditExpense = AppState.ExpenseToEdit;
+        currentExpenseType = EditExpense.Type;
+        SetCategories(EditExpense.Type);
+
+        System.Diagnostics.Debug.WriteLine(AppState.ExpenseToEdit);
+    }
+
+}

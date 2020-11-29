@@ -1,0 +1,52 @@
+﻿<div class="NavGroupClass">
+    <a href="#" @onclick=ToggleCollapse>
+        @if (!Collapse)
+        {
+            <span class="oi oi-minus oi-custom" aria-hidden="true"></span>
+        }
+        else
+        {
+            <span class="oi oi-plus oi-custom" aria-hidden="true"></span>
+        }
+        @Title
+    </a>
+    @if (!Collapse)
+    {
+        @ChildContent
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public bool Collapse { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    private void ToggleCollapse()
+    {
+        Collapse = !Collapse;
+    }
+}
+
+@* <div class="accordion" id="navAccordian">
+
+        <div class="card">
+            <div class="card-header" id="journalHeading">
+                <a class="navGroupLink" data-toggle="collapse" data-target="#collapseJournal">
+                    <span class="oi oi-plus" aria-hidden="true"></span>Journal
+                </a>
+            </div>
+            <div id="collapseJournal" class="collapse" data-parent="#navAccordian">
+                <div class="card-body">
+                    @ChildContent
+                </div>
+                <div></div>
+            </div>
+        </div>
+
+
+    </div> *@

@@ -7,23 +7,24 @@ namespace Home.Shared.DAL.Models
 {
     public enum ExpenseCategory
     {
-        Food,
-        Rent,
-        Utilities,
-        Bills,
-        Shopping,
-        Transportation,
-        Insurance,
-        Medical,
-        Clothing,
-        Tithing,
-        Charity,
-        Other,
+        Food = 0,
+        Rent= 1,
+        Utilities = 2,
+        Bills =3,
+        Shopping = 4,
+        Transportation = 5,
+        Insurance = 6,
+        Medical = 7,
+        School = 12,
+        Clothing = 8,
+        Tithing = 9,
+        Charity = 10,
+        Other = 11,
 
-        Salary,
-        Interest,
-        Business,
-        Gifts
+        Salary = 112,
+        Interest = 113,
+        Business = 114,
+        Gifts = 115
     }
 
     public enum ExpenseType

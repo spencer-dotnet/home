@@ -1,4 +1,24 @@
 ﻿@inject HttpClient _httpClient
+@inject NavigationManager NavigationManager
+
+<div>
+    <h4>Filters</h4>
+
+    <label for="filter-category">Category</label>
+    <select class="form-control" id="filter-category" @bind="FilterCategory">
+        @foreach (string cat in Enum.GetNames(typeof(ExpenseCategory)))
+        {
+            <option>@cat</option>
+        }
+        <option></option>
+    </select>
+    <div class="form-group">
+        <label for="filter-date">Transactions Before Date:</label>
+        <input type="date" class="form-control" id="filter-date" @bind="FilterDate" />
+    </div>
+    <button class="btn btn-primary" @onclick=ClickFilter>Filter</button>
+    <button class="btn btn-primary" @onclick="ClickNoFilter"> Remove Filters</button>
+</div>
 
 <div>
     @if (AppState.Expenses == null || AppState.Expenses.Count == 0)
@@ -15,7 +35,9 @@
                 <tr>
                     <td>Date</td>
                     <td>Amount</td>
+                    <td>Payment Method</td>
                     <td>Category</td>
+                    <td>Description</td>
                     <td><!--Blank--></td>
                 </tr>
             </thead>
@@ -24,9 +46,16 @@
                 {
                     <tr>
                         <td>@e.Date.ToShortDateString()</td>
-                        <td>@e.Amount</td>
+                        <td style="color:@(e.Type == ExpenseType.Expense ? "red" : "green")">
+                            @e.Amount.ToString("C")
+                        </td>
+                        <td>@e.PaymentMode</td>
                         <td>@e.Category</td>
-                        <td><button class="btn btn-danger" @onclick="(ev => DeleteExpense(e.Id))">Delete</button></td>
+                        <td>@e.Description</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="(ev => DeleteExpense(e.Id))">Delete</button>
+                            <button class="btn btn-success" @onclick="(ev => OnEditClick(e))">Edit</button>
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -40,15 +69,20 @@
 
     public string ErrorMessage { get; set; } = "";
 
+    private ExpenseCategory FilterCategory = ExpenseCategory.Other;
+    private DateTime FilterDate = DateTime.Now.AddDays(-30);
+
     protected override async Task OnInitializedAsync()
     {
-        if(AppState.Expenses.Count == 0)
+        if (AppState.Expenses.Count == 0)
         {
             var response = await _httpClient.GetAsync("api/expense");
 
             if (response.IsSuccessStatusCode)
             {
                 AppState.Expenses = await response.Content.ReadFromJsonAsync<List<Expense>>();
+                AppState.DoNotEditListExpenses = AppState.Expenses;
+                AppState.Expenses = AppState.Expenses.FindAll(e => e.Date.CompareTo(FilterDate) < 0);
             }
             else
             {
@@ -62,9 +96,32 @@
     {
         var response = await _httpClient.DeleteAsync($"api/expense/{id}");
 
-        if(response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
             AppState.RemoveExpenseById(id);
         }
+    }
+
+    private void OnEditClick(Expense value)
+    {
+        AppState.ExpenseToEdit = value;
+
+        NavigationManager.NavigateTo("/edit", false);
+    }
+
+    private void ClickFilter()
+    {
+        System.Diagnostics.Debug.WriteLine(FilterCategory);
+
+        AppState.Expenses = AppState.DoNotEditListExpenses.FindAll(
+            (e) =>
+                e.Category == FilterCategory &&
+                e.Date.CompareTo(FilterDate) < 0
+            );
+    }
+
+    private void ClickNoFilter()
+    {
+        AppState.Expenses = new List<Expense>(AppState.DoNotEditListExpenses);
     }
 }

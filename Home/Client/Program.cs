@@ -26,8 +26,8 @@ namespace Home.Client
                 .AddScoped<IUserService, UserService>()
                 .AddScoped<IHttpService, HttpService>()
                 .AddScoped<ILocalStorageService, LocalStorageService>()
-                .AddAuthorizationCore()
-                .AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
+                .AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>()
+                .AddAuthorizationCore();
 
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });

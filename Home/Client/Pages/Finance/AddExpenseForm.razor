@@ -114,11 +114,13 @@
 
         //clear form
         newExpense = new Expense() { Date = DateTime.Now };
+
+        StateHasChanged();
     }
 
     protected override void OnInitialized()
     {
-        selectableCategories = expenseCategories.Skip(expenseCategories.Length - 4).Take(4).ToArray();
+        selectableCategories = expenseCategories.Take(expenseCategories.Length - 4).ToArray();
     }
 
 }

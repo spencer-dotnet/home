@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -26,7 +27,7 @@ namespace Home.Client
         {
             var savedToken = await _localStorage.GetItem("authToken");
 
-            if (string.IsNullOrWhiteSpace(savedToken))
+            if (string.IsNullOrWhiteSpace(savedToken) || JwtIsExpired(savedToken))
             {
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
@@ -81,6 +82,17 @@ namespace Home.Client
             claims.AddRange(keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString())));
 
             return claims;
+        }
+
+        public bool JwtIsExpired(string jwt)
+        {
+            var token = new JwtSecurityTokenHandler().ReadJwtToken(jwt);
+
+            if(DateTime.Compare(DateTime.Now, token.ValidTo) > 0)
+            {
+                return true;
+            }
+            return false;
         }
 
         private byte[] ParseBase64WithoutPadding(string base64)

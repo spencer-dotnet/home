@@ -21,14 +21,9 @@ namespace Home.Shared.Services
 
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-            if (env == "Development")
-            {
-                connectionString = _config["FamilyMongoDatabaseSettings:ConnectionString"];
-            }
-            else
-            {
-                connectionString = Environment.GetEnvironmentVariable("MongoConnectionString");
-            }
+            //connectionString = _config["FamilyMongoDatabaseSettings:ConnectionString"];
+            connectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING");
+
 
             var client = new MongoClient(connectionString);
             var database = client.GetDatabase("family");
@@ -46,6 +41,12 @@ namespace Home.Shared.Services
         {
             _expenses.InsertOne(expense);
             return expense;
+        }
+
+        public IEnumerable<Expense> CreateMany(IEnumerable<Expense> expensesToAdd)
+        {
+            _expenses.InsertMany(expensesToAdd);
+            return expensesToAdd;
         }
 
         public void Update(string id, Expense expenseIn) =>
