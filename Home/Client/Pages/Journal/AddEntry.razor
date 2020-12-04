@@ -1,0 +1,33 @@
+﻿@page "/Journal/AddEntry"
+@inject HttpClient Http
+
+<h3>AddEntry</h3>
+
+<EditForm Model="newEntry" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="entryTitle">Title</label>
+        <input type="text" class="form-control" id="entryTitle" @bind="newEntry.Title" />
+    </div>
+
+    <div class="form-group">
+        <label for="entryText">Text</label>
+        <textarea class="form-control" id="entryText" @bind="newEntry.Text" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Submit</button>
+
+</EditForm>
+
+@code {
+    JournalEntry newEntry = new JournalEntry();
+
+    private async void HandleValidSubmit()
+    {
+        newEntry.Date = DateTime.Now;
+        var response = await Http.PostAsJsonAsync<JournalEntry>("api/journal", newEntry);
+    }
+
+}
